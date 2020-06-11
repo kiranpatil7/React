@@ -71,9 +71,7 @@ class Menu extends Component{
         return(
             <div className="container">
                 <div className="row">
-                    <Menu list>
-                        {menu}
-                    </Menu>
+                    {menu}
                 </div>
             </div>
 
