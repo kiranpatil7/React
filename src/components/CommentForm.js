@@ -26,6 +26,7 @@ class Comment extends Component {
     }
     commentDisplay = (values) => {
         //console.log('Current State is: ' + JSON.stringify(values));
+        this.commenentModal();
         alert('Current State is: ' + JSON.stringify(values));
 
     }
@@ -43,8 +44,7 @@ class Comment extends Component {
                             <Label htmlFor="rating">Rating</Label>
                             <Row className="form-group m-1">
                                 <Control.select model=".rating" name="rating"
-                                    // value={this.state.contactType}
-                                    // onChange={this.handleInputChange}
+
                                     className="form-control">
                                     <option>1</option>
                                     <option>2</option>
@@ -80,8 +80,19 @@ class Comment extends Component {
                                 <Control.textarea model=".message" id="message" name="message"
                                     rows="6"
                                     className="form-control"
+                                    validators={{
+                                        required
+
+                                    }}
 
                                 ></Control.textarea>
+                                <Errors
+                                    className="text-danger"
+                                    show="touched"
+                                    model=".message"
+                                    messages={{
+                                        required: "Write Something"
+                                    }} />
 
                             </Row>
 

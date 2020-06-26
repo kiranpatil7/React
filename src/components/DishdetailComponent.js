@@ -4,6 +4,21 @@ import { Link } from 'react-router-dom';
 import Comment from './CommentForm';
 
 
+//You can write here Comment component class here to modal the comment
+
+// class Comment extends Component {
+//     constructor(props) {
+//         super(props);
+//     };
+//     render()
+//     {
+//         return(
+//           <></>  
+//         );
+//     }
+// }
+
+
 function RenderDish({ details }) {
     return (
 
@@ -25,7 +40,8 @@ function RenderComments({ comments }) {
             return (
                 <>
                     <p>{com.comment}</p>
-                    <p>-- {com.author}, {com.date}</p>
+                    <p>-- {com.author} ,
+                    {new Intl.DateTimeFormat('en-us', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(com.date)))}</p>
                 </>
             );
 
