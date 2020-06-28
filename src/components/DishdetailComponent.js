@@ -1,22 +1,124 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Card, CardBody, CardTitle, CardText, CardImg, BreadcrumbItem, Breadcrumb } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import Comment from './CommentForm';
+//import Comment from './CommentForm';
+import { Modal, ModalHeader, ModalBody, Button, Row, Col, Label } from 'reactstrap';
+import { LocalForm, Control, Errors } from 'react-redux-form';
 
 
-//You can write here Comment component class here to modal the comment
+const required = (val) => val && val.length;
+const maxLength = (len) => (val) => !(val) || (val.length <= len);
+const minLength = (len) => (val) => val && (val.length >= len);
 
-// class Comment extends Component {
-//     constructor(props) {
-//         super(props);
-//     };
-//     render()
-//     {
-//         return(
-//           <></>  
-//         );
-//     }
-// }
+class CommentForm extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            open: false
+        };
+        this.commenentModal = this.commenentModal.bind(this);
+        this.commentDisplay = this.commentDisplay.bind(this);
+    };
+    commenentModal() {
+
+        //alert("hiii");
+        this.setState({
+            open: !this.state.open
+
+        });
+    }
+    commentDisplay = (values) => {
+        //  console.log('Current State is: ' + JSON.stringify(values));
+        this.commenentModal();
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        // alert('Current State is: ' + JSON.stringify(values));
+
+    }
+    render() {
+        return (
+            <div>
+                <Button outline onClick={this.commenentModal}>
+                    <span className="fa fa-pencil fa-lg "></span> Submit Comment
+                </Button>
+
+                <Modal isOpen={this.state.open} toggle={this.commenentModal}>
+                    <ModalHeader toggle={this.commenentModal}>Submit Comment</ModalHeader>
+                    <ModalBody>
+                        <LocalForm onSubmit={(values) => this.commentDisplay(values)}>
+                            <Label htmlFor="rating">Rating</Label>
+                            <Row className="form-group m-1">
+                                <Control.select model=".rating" name="rating"
+
+                                    className="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+
+                                </Control.select >
+                            </Row>
+                            <Label htmlFor="yourname">Your Name</Label>
+                            <Row className="form-group m-1">
+                                <Control.text model=".yourname" id="yourname" name="yourname"
+                                    className="form-control"
+                                    placeholder="Your Name"
+                                    validators={{
+                                        required, minLength: minLength(3), maxLength: maxLength(15)
+                                    }} />
+                                <Errors
+                                    className="text-danger"
+                                    model=".yourname"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Required,',
+                                        minLength: 'Must be greater than 2 characters',
+                                        maxLength: 'Must be 15 characters or less'
+                                    }}
+                                />
+
+                            </Row>
+
+                            <Label htmlFor="message">Comment</Label>
+                            <Row className="form-group m-1">
+                                <Control.textarea model=".message" id="message" name="message"
+                                    rows="6"
+                                    className="form-control"
+                                    validators={{
+                                        required
+
+                                    }}
+
+                                ></Control.textarea>
+                                <Errors
+                                    className="text-danger"
+                                    show="touched"
+                                    model=".message"
+                                    messages={{
+                                        required: "Write Something"
+                                    }} />
+
+                            </Row>
+
+                            <Row className="form-group">
+                                <Col>
+                                    <Button type="submit" color="primary">
+                                        Submit
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </LocalForm>
+
+                    </ModalBody>
+
+                </Modal>
+
+            </div>
+        );
+    }
+}
+
 
 
 function RenderDish({ details }) {
@@ -32,29 +134,38 @@ function RenderDish({ details }) {
 
     );
 }
-function RenderComments({ comments }) {
+function RenderComments({ comments, addComment, dishId }) {
     //return (<h2>{comments.comment}</h2>);
     if (comments != null) {
 
-        const menu = comments.map((com) => {
-            return (
-                <>
-                    <p>{com.comment}</p>
-                    <p>-- {com.author} ,
-                    {new Intl.DateTimeFormat('en-us', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(com.date)))}</p>
-                </>
-            );
 
-        })
         return (
-            <div>
-                {menu}
-                <div>
-                    <Comment />
-                </div>
+            <>
+                <h4>Comments</h4>
+                <ul className="list-unstyled ">
+                    {comments.map((com) => {
+                        return (
+                            <li key={com.id}>
+                                <p>{com.comment}</p>
+                                <p>-- {com.author} ,
+                                  {new Intl.DateTimeFormat('en-us', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(com.date)))}</p>
 
-            </div>
+                            </li>
+
+                        );
+
+                    })}
+
+                </ul>
+
+                <CommentForm dishId={dishId} addComment={addComment} />
+
+
+
+
+            </>
         );
+
     }
     else {
         return (
@@ -92,7 +203,9 @@ const DishDetail = (props) => {
                         <RenderDish details={props.details} />
                     </div>
                     <div className="col-12 col-md-5 m-1">
-                        {<RenderComments comments={props.comments} />}
+                        {<RenderComments comments={props.comments}
+                            addComment={props.addComment}
+                            dishId={props.details.id} />}
                     </div>
 
                 </div>
