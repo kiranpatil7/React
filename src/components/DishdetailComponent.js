@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, Button, Row, Col, Label } from 'reactstrap';
 import { LocalForm, Control, Errors } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
+
 
 
 const required = (val) => val && val.length;
@@ -18,10 +20,10 @@ class CommentForm extends Component {
         this.state = {
             open: false
         };
-        this.commenentModal = this.commenentModal.bind(this);
+        this.commentModal = this.commentModal.bind(this);
         this.commentDisplay = this.commentDisplay.bind(this);
     };
-    commenentModal() {
+    commentModal() {
 
         //alert("hiii");
         this.setState({
@@ -31,20 +33,21 @@ class CommentForm extends Component {
     }
     commentDisplay = (values) => {
         //  console.log('Current State is: ' + JSON.stringify(values));
-        this.commenentModal();
-        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.commentModal();
+        alert(values.author + "\n" + values.comment);
+        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
         // alert('Current State is: ' + JSON.stringify(values));
 
     }
     render() {
         return (
             <div>
-                <Button outline onClick={this.commenentModal}>
+                <Button outline onClick={this.commentModal}>
                     <span className="fa fa-pencil fa-lg "></span> Submit Comment
                 </Button>
 
-                <Modal isOpen={this.state.open} toggle={this.commenentModal}>
-                    <ModalHeader toggle={this.commenentModal}>Submit Comment</ModalHeader>
+                <Modal isOpen={this.state.open} toggle={this.commentModal}>
+                    <ModalHeader toggle={this.commentModal}>Submit Comment</ModalHeader>
                     <ModalBody>
                         <LocalForm onSubmit={(values) => this.commentDisplay(values)}>
                             <Label htmlFor="rating">Rating</Label>
@@ -126,7 +129,7 @@ function RenderDish({ details }) {
     return (
 
         <Card>
-            <CardImg src={details.image} alt={details.name} />
+            <CardImg src={baseUrl + details.image} alt={details.name} />
             <CardBody>
                 <CardTitle>{details.name}</CardTitle>
                 <CardText>{details.description}</CardText>
@@ -135,7 +138,7 @@ function RenderDish({ details }) {
 
     );
 }
-function RenderComments({ comments, addComment, dishId }) {
+function RenderComments({ comments, postComment, dishId }) {
     //return (<h2>{comments.comment}</h2>);
     if (comments != null) {
 
@@ -159,7 +162,7 @@ function RenderComments({ comments, addComment, dishId }) {
 
                 </ul>
 
-                <CommentForm dishId={dishId} addComment={addComment} />
+                <CommentForm dishId={dishId} postComment={postComment} />
 
 
 
@@ -225,7 +228,7 @@ const DishDetail = (props) => {
                     </div>
                     <div className="col-12 col-md-5 m-1">
                         {<RenderComments comments={props.comments}
-                            addComment={props.addComment}
+                            postComment={props.postComment}
                             dishId={props.details.id} />}
                     </div>
 
