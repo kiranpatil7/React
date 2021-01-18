@@ -1,5 +1,4 @@
 import * as ActionTypes from './ActionTypes';
-//import { DISHES } from '../shared/dishes'
 import { baseUrl } from '../shared/baseUrl'
 
 export const addComment = (comment) => ({
@@ -25,11 +24,12 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
         credentials: "same-origin"
     })
         .then(responce => {
+            //console.log(responce)
             if (responce.ok) {
                 return responce;
             }
             else {
-                var errMess = new Error("Error" + responce.sthtatus + ": " + responce.statusText);
+                var errMess = new Error("Error" + responce.status + ": " + responce.statusText);
                 errMess.responce = responce;
                 throw errMess;
             }
@@ -43,6 +43,41 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
 }
 
+export const postFeedBack = (feedback) => (dispatch) => {
+    const newFeedback = Object.assign({ date: new Date().toISOString() }, feedback);
+    return fetch(baseUrl + 'feedback', {
+        method: 'POST',
+        body: JSON.stringify(newFeedback),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                var error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+
+                throw error;
+            }
+        },
+            error => {
+                var errorMessage = new Error(error.errorMessage);
+                throw errorMessage;
+            }
+        )
+        .then(responce => responce.json())
+        .then(feedback => dispatch(addComment(feedback)))
+        .catch(error => {
+            console.log('Post feedback: ' + error.message);
+            alert('Feedback could not be posted:\n' + error.message)
+        })
+
+
+}
+
 export const fetchDishes = () => (dispatch) => {
     dispatch(dishesLoading(true));
 
@@ -52,7 +87,7 @@ export const fetchDishes = () => (dispatch) => {
                 return responce;
             }
             else {
-                var errMess = new Error("Error" + responce.sthtatus + ": " + responce.statusText);
+                var errMess = new Error("Error" + responce.status + ": " + responce.statusText);
                 errMess.responce = responce;
                 throw errMess;
             }
@@ -64,6 +99,28 @@ export const fetchDishes = () => (dispatch) => {
         .then(dishes => dispatch(addDishes(dishes)))
         .catch(error => dispatch(dishesFailed(error.message)))
 }
+export const fetchLeaders = () => (dispatch) => {
+
+    dispatch(leaderLoading(true));
+    return fetch(baseUrl + 'leaders')
+        .then(responce => {
+            if (responce.ok) {
+                return responce;
+            }
+            else {
+                var errMess = new Error("Error" + responce.status + ": " + responce.statusText);
+                errMess.responce = responce;
+                throw errMess;
+            }
+
+        }, error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+        })
+        .then(responce => responce.json())
+        .then(leaders => dispatch(addLeaders(leaders)))
+        .catch(error => dispatch(leaderFailed(error.message)))
+}
 
 export const fetchComments = () => (dispatch) => {
     return fetch(baseUrl + 'comments')
@@ -72,7 +129,7 @@ export const fetchComments = () => (dispatch) => {
                 return responce;
             }
             else {
-                var errMess = new Error("Error" + responce.sthtatus + ": " + responce.statusText);
+                var errMess = new Error("Error" + responce.status + ": " + responce.statusText);
                 errMess.responce = responce;
                 throw errMess;
             }
@@ -93,7 +150,7 @@ export const fetchPromos = () => (dispatch) => {
                 return responce;
             }
             else {
-                var errMess = new Error("Error" + responce.sthtatus + ": " + responce.statusText);
+                var errMess = new Error("Error" + responce.status + ": " + responce.statusText);
                 errMess.responce = responce;
                 throw errMess;
             }
@@ -106,6 +163,17 @@ export const fetchPromos = () => (dispatch) => {
         .catch(error => dispatch(promosFailed(error.message)));
 }
 
+export const addLeaders = (leaders) => ({
+    type: ActionTypes.ADD_LEADERS,
+    payload: leaders
+});
+export const leaderFailed = (errMess) => ({
+    type: ActionTypes.LEADERS_FAILED,
+    payload: errMess
+})
+export const leaderLoading = () => ({
+    type: ActionTypes.LEADERS_LOADING
+})
 export const dishesLoading = () => ({
     type: ActionTypes.DISHES_LOADING
 });

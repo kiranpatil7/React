@@ -6,6 +6,7 @@ import { Modal, ModalHeader, ModalBody, Button, Row, Col, Label } from 'reactstr
 import { LocalForm, Control, Errors } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
+import { Fade, Stagger, FadeTransform } from 'react-animation-components'
 
 
 
@@ -32,9 +33,9 @@ class CommentForm extends Component {
         });
     }
     commentDisplay = (values) => {
-        //  console.log('Current State is: ' + JSON.stringify(values));
+        console.log('Current State is: ' + JSON.stringify(values));
         this.commentModal();
-        alert(values.author + "\n" + values.comment);
+        // alert(values.author + "\n" + values.comment);
         this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
         // alert('Current State is: ' + JSON.stringify(values));
 
@@ -127,14 +128,16 @@ class CommentForm extends Component {
 
 function RenderDish({ details }) {
     return (
-
-        <Card>
-            <CardImg src={baseUrl + details.image} alt={details.name} />
-            <CardBody>
-                <CardTitle>{details.name}</CardTitle>
-                <CardText>{details.description}</CardText>
-            </CardBody>
-        </Card>
+        <FadeTransform in
+            transformProps={{ exitTransform: 'scale(0.5) translateY(-50%)' }}>
+            <Card>
+                <CardImg src={baseUrl + details.image} alt={details.name} />
+                <CardBody>
+                    <CardTitle>{details.name}</CardTitle>
+                    <CardText>{details.description}</CardText>
+                </CardBody>
+            </Card>
+        </FadeTransform >
 
     );
 }
@@ -147,18 +150,21 @@ function RenderComments({ comments, postComment, dishId }) {
             <>
                 <h4>Comments</h4>
                 <ul className="list-unstyled ">
-                    {comments.map((com) => {
-                        return (
-                            <li key={com.id}>
-                                <p>{com.comment}</p>
-                                <p>-- {com.author} ,
+                    <Stagger in>
+                        {comments.map((com) => {
+                            return (
+                                <Fade in>
+                                    <li key={com.id}>
+                                        <p>{com.comment}</p>
+                                        <p>-- {com.author} ,
                                   {new Intl.DateTimeFormat('en-us', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(com.date)))}</p>
 
-                            </li>
+                                    </li>
+                                </Fade>
+                            );
 
-                        );
-
-                    })}
+                        })}
+                    </Stagger>
 
                 </ul>
 
